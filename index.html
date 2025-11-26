@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #222; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    .app {
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    #question {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        color: #555;
+    }
+
+    #answer-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        padding: 12px;
+        font-size: 1rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #ddd;
+    }
+
+    .btn.correct {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .btn.incorrect {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    #next-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        display: none;
+    }
+
+    #next-btn:hover {
+        background-color: #2980b9;
+    }
+
+    @media (max-width: 600px) {
+        .app {
+            padding: 20px;
+        }
+
+        #question {
+            font-size: 1rem;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+        }
+
+        #next-btn {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="app">
+    <h1>Main Quiz APP</h1>
+    <h2 id="question">Question appears here</h2>
+    <div id="answer-buttons"></div>
+    <button id="next-btn">Next</button>
+</div>
+
+<script>
+const questionElement = document.getElementById("question");
+const answerButtons = document.getElementById("answer-buttons");
+const nextButton = document.getElementById("next-btn");
+
+let currentQuestionIndex = 0;
+let score = 0;
+
+const questions = [
+    {
+        question: "Which tag is used to create a paragraph in HTML?",
+        answers: [
+            { text: "<p>", correct: true },
+            { text: "<h1>", correct: false },
+            { text: "<div>", correct: false },
+            { text: "<span>", correct: false }
+        ]
+    },
+    {
+        question: "Which attribute is used to add a link in HTML?",
+        answers: [
+            { text: "href", correct: true },
+            { text: "src", correct: false },
+            { text: "link", correct: false },
+            { text: "alt", correct: false }
+        ]
+    },
+    {
+        question: "How many years does it take in learning Coding?",
+        answers: [
+            { text: "2", correct: false },
+            { text: "6 months", correct: false },
+            { text: "10 years", correct: false },
+            { text: "Forever", correct: true }
+        ]
+    },
+    {
+        question: "what did i use to do this app?",
+        answers: [
+            { text: "AI", correct: true },
+            { text: "Youtube", correct: false },
+            { text: "PDF", correct: false },
+            { text: "Code from my head", correct: false }
+        ]
+    }
+];
+
+function startQuiz() { 
+    currentQuestionIndex = 0;
+    score = 0;
+    nextButton.style.display = "none";
+    nextButton.innerText = "Next";
+    showQuestion();
+}
+
+function showQuestion() {
+    resetState();
+    const currentQuestion = questions[currentQuestionIndex];
+    questionElement.innerText = (currentQuestionIndex + 1) + ". " + currentQuestion.question;
+
+    currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerText = answer.text;
+        button.classList.add("btn");
+        if(answer.correct) button.dataset.correct = "true";
+        button.addEventListener("click", selectAnswer);
+        answerButtons.appendChild(button);
+    });
+}
+
+function resetState() {
+    nextButton.style.display = "none";
+    while(answerButtons.firstChild) {
+        answerButtons.removeChild(answerButtons.firstChild);
+    }
+}
+
+function selectAnswer(e) {
+    const selectedBtn = e.target;
+    const isCorrect = selectedBtn.dataset.correct === "true";
+
+    if(isCorrect){
+        selectedBtn.classList.add("correct");
+        score++;
+    } else {
+        selectedBtn.classList.add("incorrect");
+    }
+
+        Array.from(answerButtons.children).forEach(button => {
+            button.disabled = true;
+            if(button.dataset.correct === "true") button.classList.add("correct");
+        });
+
+        nextButton.style.display = "inline-block";
+}
+
+nextButton.addEventListener("click", () => {
+    currentQuestionIndex++;
+    if(currentQuestionIndex < questions.length){
+        showQuestion();
+    } else {
+        showScore();
+    }
+});
+
+function showScore() {
+    resetState();
+    questionElement.innerText = `🎉 You scored ${score} out of ${questions.length}!`;
+    nextButton.innerText = "Restart Quiz";
+    nextButton.style.display = "inline-block";
+    nextButton.onclick = () => {
+        nextButton.innerText = "Next";
+        startQuiz();
+    };
+}
+
+startQuiz();
+</script>
+
+</body>
+</html>
